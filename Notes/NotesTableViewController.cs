@@ -22,7 +22,11 @@ namespace Notes
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
-			// Perform any additional setup after loading the view, typically from a nib.
+			// Perform any additional setup after loading the view, typically from a nib
+
+			DB database = new DB();
+			database.Initialize();
+
 		}
 
 		public override void DidReceiveMemoryWarning()

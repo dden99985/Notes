@@ -11,12 +11,12 @@ namespace Notes
 
 		public WeakReference ViewController{get; set;}
 		public NSIndexPath indexPath;
-		bool touchesCaptured;
+//		bool touchesCaptured;
 
         public NotesTableViewCell (IntPtr handle) : base (handle)
         {
 			path = new CGPath();
-			touchesCaptured = false;
+//			touchesCaptured = false;
 
 			path.AddLines(new CGPoint[]{
 					new CGPoint(5,5),
@@ -44,7 +44,7 @@ namespace Notes
 			base.TouchesBegan(touches, evt);
 
 			Console.WriteLine("TouchesBegan: touchesCaptured:true");
-			touchesCaptured = true;
+//			touchesCaptured = true;
 			UITouch touch = touches.AnyObject as UITouch;
 			if (touch != null)
 			{
@@ -78,16 +78,18 @@ namespace Notes
 			if (touch != null)
 			{
 				path.AddLineToPoint(touch.LocationInView(this));
-				NotesTableViewController vc = (NotesTableViewController)ViewController.Target;
-
-				if (path.BoundingBox.Height + 20 > vc.RowHeights[indexPath.Row])
+				if (path.BoundingBox.Y < 0)
 				{
-					vc.RowHeights[indexPath.Row] = path.BoundingBox.Height + 20;
-					vc.UpdateViewConstraints();
+					path = path.CopyByTransformingPath(CGAffineTransform.MakeTranslation(0f, path.BoundingBox.Y * -1));
+				}
+
+				NotesTableViewController vc = (NotesTableViewController)ViewController.Target;
+				if (path.BoundingBox.Height + 2 > vc.RowHeights[indexPath.Row])
+				{
 					vc.TableView.BeginUpdates();
+					vc.RowHeights[indexPath.Row] = path.BoundingBox.Height + 2;
+					//vc.UpdateViewConstraints();
 					vc.TableView.EndUpdates();
-					//vc.TableView.SetNeedsDisplay();
-					//InvokeOnMainThread(() => vc.TableView.ReloadRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic));
 				}
 				SetNeedsDisplayInRect(CGRect.Inflate(path.BoundingBox, 5f, 5f));
 			}
@@ -97,15 +99,16 @@ namespace Notes
 		{
 			base.TouchesEnded(touches, evt);
 			Console.WriteLine("TouchesEnded: touchesCaptured:false");
-			touchesCaptured = false;
+			//			touchesCaptured = false;
 			SetNeedsDisplayInRect(CGRect.Inflate(path.BoundingBox, 5f, 5f));
+//			((NotesTableViewController)ViewController.Target).View.UpdateConstraints();
 		}
 
 		public override void TouchesCancelled(NSSet touches, UIEvent evt)
 		{
 			base.TouchesCancelled(touches, evt);
 			Console.WriteLine("TouchesCancelled: touchesCaptured:false");
-			touchesCaptured = false;
+//			touchesCaptured = false;
 		}
 
 		public override void Draw(CoreGraphics.CGRect rect)

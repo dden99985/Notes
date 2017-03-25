@@ -108,7 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
-    <Folder Include="Database\" />
+    <Folder Include="Data\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -134,8 +134,9 @@
     <Compile Include="NotesTableViewCell.designer.cs">
       <DependentUpon>NotesTableViewCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Database\DB.cs" />
-    <Compile Include="Database\Control.cs" />
+    <Compile Include="Data\DB.cs" />
+    <Compile Include="Data\Control.cs" />
+    <Compile Include="Data\Note.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

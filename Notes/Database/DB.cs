@@ -1,8 +1,19 @@
 ﻿using System;
 using System.IO;
-using Mono.Data.Sqlite;
+using System.Runtime;
+using Newtonsoft.Json;
 
-namespace Notes
+/*
+ * Library/NotesDB
+ *   control.json {version, nextid}
+ *   Notes/
+ *     YYYY.MM.DD/
+ *       0000000001
+ *       0000000002
+ */
+
+
+namespace Notes.DB
 {
 	public class DB
 	{
@@ -14,66 +25,56 @@ namespace Notes
 		private object locker;
 
 		/// <summary>
-		/// Path to the library folder
+		/// Path to the NotesDB folder
 		/// </summary>
-		private string libraryPath;
+		private string dbPath;
 
 		/// <summary>
-		/// Full pathname for the databae
+		/// Path to the control file
 		/// </summary>
-		private string dbName;
+		private string controlPath;
+
 
 		/// <summary>
-		/// Path to the library folder
+		/// Path to the NotesDB folder
 		/// </summary>
-		/// <value>Path to the library folder.</value>
-		public string LibraryPath
+		/// <value>Path to the NotesDB folder.</value>
+		public string DBPath
 		{
 			get
 			{
-				if (libraryPath == null)
+				if (dbPath == null)
 				{
 					// Get Library folder
 					string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-					libraryPath = Path.Combine(documentsPath, "..", "Library"); // Library folder instead
+					dbPath = Path.Combine(documentsPath, "..", "Library/NotesDB"); // Library folder instead
 				}
-				return libraryPath;
+				return dbPath;
 			}
 		}
 
 		/// <summary>
-		/// Filename of the database
+		/// Path to the control file
 		/// </summary>
-		/// <value>The name of the database file.</value>
-		public string FileName
+		/// <value>Path to the control file.</value>
+		public string ControlPath
 		{
 			get
 			{
-				return "notes.db3";
-			}
-		}
-
-		/// <summary>
-		/// Full pathname of the database
-		/// </summary>
-		/// <value>Full path of the database.</value>
-		public string DBName
-		{
-			get
-			{
-				if (dbName == null)
+				if (controlPath == null)
 				{
-					dbName = Path.Combine(LibraryPath, FileName);
+					// Get Library folder
+					controlPath = Path.Combine(DBPath, "control.json");
 				}
-				return dbName;
+				return controlPath;
 			}
 		}
 
 		public DB()
 		{
 			locker = new object();
-			libraryPath = null;
-			dbName = null;
+			dbPath = null;
+			controlPath = null;
 		}
 
 		/// <summary>
@@ -89,65 +90,64 @@ namespace Notes
 		/// <summary>
 		/// Create the schema if it doesn't already exist
 		/// </summary>
-		private void setupSchema(SqliteConnection connection)
+		private void setupSchema()
 		{
-			var datatable = connection.GetSchema("Tables");
-			var rows = datatable.Select("table_name = 'control'");
-			if(rows.Length == 0)
-			{
-				// Create control table
-				using (var command = connection.CreateCommand())
-				{
-					command.CommandText = "CREATE TABLE control (tag TEXT NOT NULL PRIMARY KEY, value TEXT);";
-					command.ExecuteNonQuery();
-					command.CommandText = "INSERT INTO control (tag, value) VALUES ('VERSION', @version);";
-					command.Parameters.AddWithValue("@version", version);
-					command.ExecuteNonQuery();
-				}
-			}
-
-			// Verify database version
-			using (var command = connection.CreateCommand())
-			{
-				command.CommandText = "SELECT value FROM control WHERE tag = @tag;";
-				command.Parameters.AddWithValue("@tag", "VERSION");
-				var dbVersion = command.ExecuteScalar().ToString();
-				if (dbVersion.CompareTo(version) != 0)
-				{
-					upgrade(dbVersion);
-				}
-			}
-
-
-
-				
-
 
 			int bob = 3;
+		}
+
+		protected void writeObject<T>(T obj, string filename)
+		{
+			JsonSerializer serializer = new JsonSerializer();
+			serializer.NullValueHandling = NullValueHandling.Ignore;
+
+			// Create the directory if it doesn't exist
+			string path = Path.GetDirectoryName(filename);
+			Directory.CreateDirectory(Path.GetDirectoryName(filename));
+
+			using (StreamWriter sw = new StreamWriter(filename))
+			{
+				using (JsonWriter writer = new JsonTextWriter(sw))
+				{
+					serializer.Serialize(writer, obj);
+				}
+			}
+		}
+
+		protected T readObject<T>(string filename)
+		{
+			JsonSerializer serializer = new JsonSerializer();
+			serializer.NullValueHandling = NullValueHandling.Ignore;
+
+			using (StreamReader sr = new StreamReader(filename))
+			{
+				using (JsonReader reader = new JsonTextReader(sr))
+				{
+					return serializer.Deserialize<T>(reader);
+				}
+			}
 		}
 
 
 		public void Initialize()
 		{
+			Control control;
+
 			// Check if database already exists
-			if (!File.Exists(DBName))
+			if (!File.Exists(ControlPath))
 			{
 				// Create new database
-				SqliteConnection.CreateFile(DBName);
-			}
-
-			// Create the connection
-			using (var connection = new SqliteConnection("Data Source=" + DBName))
-			{
-				// SQLLite is not thread safe
-				lock(locker)
+				lock (locker)
 				{
-					connection.Open();
-
-					setupSchema(connection);
-
-					connection.Close();
+					control = new Control(version, 1);
+					writeObject(control, ControlPath);
+					//					string output = JsonConvert.SerializeObject(cnt)
 				}
+			}
+			else
+			{
+				control = readObject<Control>(ControlPath);
+				int bob = 3;
 			}
 
 		}

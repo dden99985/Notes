@@ -24,7 +24,7 @@ namespace Notes
 			base.ViewDidLoad();
 			// Perform any additional setup after loading the view, typically from a nib
 
-			DB database = new DB();
+			DB.DB database = new DB.DB();
 			database.Initialize();
 
 		}

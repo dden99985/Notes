@@ -39,12 +39,7 @@ namespace Notes.Data
 				// Read the control info
 				lock (locker)
 				{
-					using (StreamReader sr = new StreamReader(DB.ControlPath))
-					{
-						JObject o = (JObject)JToken.ReadFrom(new JsonTextReader(sr));
-						this.Version = (string)o["Version"];
-						this.NextNoteId = (int)o["NextNoteId"];
-					}
+					DB.ReadObject(DB.ControlPath, this);
 				}
 			}
 		}

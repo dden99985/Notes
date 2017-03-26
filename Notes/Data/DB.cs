@@ -7,8 +7,9 @@ using Newtonsoft.Json;
  * Library/NotesDB
  *   control.json {Version, NextNoteId}
  *   Notes/
- *     0000000001
- *     0000000002
+ *     contents.json
+ *     0000000001.json
+ *     0000000002.json
  */
 
 
@@ -21,6 +22,10 @@ namespace Notes.Data
 		/// </summary>
 		/// <returns>The Path for this object.</returns>
 		string GetPath();
+
+		void Write();
+		void Read();
+
 	}
 
 
@@ -36,25 +41,21 @@ namespace Notes.Data
 		/// <summary>
 		/// Path to the NotesDB folder
 		/// </summary>
-		private static string dbPath = null;
+		private static string dbPath;
 
 		/// <summary>
 		/// Path to the control file
 		/// </summary>
-		private static string controlPath = null;
+		private static string controlPath;
 
 		/// <summary>
 		/// Access to the database control file
 		/// </summary>
 		public static Control control;
 
+		public static NotesList AllNotes { get; set; }
+
 		#endregion
-
-		/// <summary>
-		/// Used to lock access to the control file
-		/// </summary>
-		private static object ControlLocker = new object();
-
 
 		/// <summary>
 		/// Path to the NotesDB folder
@@ -106,6 +107,37 @@ namespace Notes.Data
 				upgrade(control.Version);
 			}
 
+			try
+			{
+				AllNotes = DB.ReadObject<NotesList>(NotesList.GetPath(1));
+			}
+			catch (FileNotFoundException)
+			{
+
+				//Note tmp;
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+
+				// No notes in the database yet, so write the empty list
+				AllNotes.Write();
+			}
+
 		}
 
 		/// <summary>
@@ -147,8 +179,7 @@ namespace Notes.Data
 		/// <param name="obj">IDBOject to write to the file system.</param>
 		public static void WriteObject(IDBObject obj)
 		{
-			string path = Path.Combine(DBPath, obj.GetPath());
-			DB.WriteObject(obj, path);
+			DB.WriteObject(obj, obj.GetPath());
 		}
 
 		/// <summary>
@@ -157,7 +188,7 @@ namespace Notes.Data
 		/// <returns>The object read from the file system.</returns>
 		/// <param name="filename">The filename, including path.</param>
 		/// <typeparam name="T">The type of object to read.</typeparam>
-		public T ReadObject<T>(string filename)
+		public static T ReadObject<T>(string filename)
 		{
 			JsonSerializer serializer = new JsonSerializer();
 			serializer.NullValueHandling = NullValueHandling.Ignore;
@@ -170,6 +201,27 @@ namespace Notes.Data
 				}
 			}
 		}
+
+
+		/// <summary>
+		/// Reads an object from the file system an loads it into obj.
+		/// </summary>
+		/// <param name="filename">The filename, including path.</param>
+		/// <param name="obj">The object to load values into.</param>
+		public static void ReadObject(string filename, object obj)
+		{
+			JsonSerializer serializer = new JsonSerializer();
+			serializer.NullValueHandling = NullValueHandling.Ignore;
+
+			using (StreamReader sr = new StreamReader(filename))
+			{
+				using (JsonReader reader = new JsonTextReader(sr))
+				{
+					serializer.Populate(reader, obj);
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:Notes.Data.DB"/> class.

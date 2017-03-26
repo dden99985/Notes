@@ -7,6 +7,8 @@ namespace Notes
 {
     public partial class NotesTableViewCell : UITableViewCell
     {
+		public Data.Note Note { get; set; }
+
 		CGPath path;
 
 		public WeakReference ViewController{get; set;}
@@ -53,22 +55,6 @@ namespace Notes
 			}
 		}
 
-		/*
-		public override bool ShouldReceiveTouch(UIGestureRecognizer recognizer, UITouch touch)
-		{
-			if (touchesCaptured)
-			{
-				Console.WriteLine("ShouldReceiveTouch: TouchCaptured:true");
-				return true;
-			}
-			else
-			{
-				Console.WriteLine("ShouldReceiveTouch: TouchCaptured:false");
-				return this.Frame.Contains(touch.LocationInView(this));
-			}
-		}
-		*/
-
 		public override void TouchesMoved(NSSet touches, UIEvent evt)
 		{
 			base.TouchesMoved(touches, evt);
@@ -84,10 +70,10 @@ namespace Notes
 				}
 
 				NotesTableViewController vc = (NotesTableViewController)ViewController.Target;
-				if (path.BoundingBox.Height + 2 > vc.RowHeights[indexPath.Row])
+				if (path.BoundingBox.Height + 2 > Note.Height)
 				{
 					vc.TableView.BeginUpdates();
-					vc.RowHeights[indexPath.Row] = path.BoundingBox.Height + 2;
+					Note.Height = path.BoundingBox.Height + 2;
 					//vc.UpdateViewConstraints();
 					vc.TableView.EndUpdates();
 				}
@@ -99,7 +85,7 @@ namespace Notes
 		{
 			base.TouchesEnded(touches, evt);
 			Console.WriteLine("TouchesEnded: touchesCaptured:false");
-			//			touchesCaptured = false;
+//			Note.Write();
 			SetNeedsDisplayInRect(CGRect.Inflate(path.BoundingBox, 5f, 5f));
 //			((NotesTableViewController)ViewController.Target).View.UpdateConstraints();
 		}
@@ -108,7 +94,6 @@ namespace Notes
 		{
 			base.TouchesCancelled(touches, evt);
 			Console.WriteLine("TouchesCancelled: touchesCaptured:false");
-//			touchesCaptured = false;
 		}
 
 		public override void Draw(CoreGraphics.CGRect rect)

@@ -85,7 +85,7 @@ namespace Notes
 		{
 			base.TouchesEnded(touches, evt);
 			Console.WriteLine("TouchesEnded: touchesCaptured:false");
-//			Note.Write();
+			Note.Write();
 			SetNeedsDisplayInRect(CGRect.Inflate(path.BoundingBox, 5f, 5f));
 //			((NotesTableViewController)ViewController.Target).View.UpdateConstraints();
 		}

@@ -21,7 +21,7 @@ namespace Notes.Data
 
 		public void Read()
 		{
-			// unfortunately, JsonSerializer.Populate doesn't use teh JasonConverter...
+			// unfortunately, JsonSerializer.Populate doesn't use the JasonConverter...
 			throw new NotImplementedException();
 		}
 

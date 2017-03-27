@@ -5,6 +5,7 @@ using UIKit;
 
 namespace Notes.Data
 {
+	[JsonConverter(typeof(NoteConverter))]
 	public class Note : IDBObject
 	{
 		
@@ -15,7 +16,8 @@ namespace Notes.Data
 
 		public void Read()
 		{
-			DB.ReadObject(GetPath(), this);
+			// unfortunately, JsonSerializer.Populate doesn't use the JasonConverter...
+			throw new NotImplementedException();
 		}
 
 		public void Write()
@@ -32,7 +34,6 @@ namespace Notes.Data
 
 		public int NoteId { get; set; }
 		public DateTime Date { get; set; }
-		[JsonConverter(typeof(nfloatConverter))]
 		public nfloat Height { get; set; }
 		public UIBezierPath BezierPath { get; set; }
 
@@ -65,6 +66,66 @@ namespace Notes.Data
 		}
 
 	}
+
+	public class NoteConverter : JsonConverter
+	{
+		public override bool CanConvert(Type objectType)
+		{
+			return objectType == typeof(Note);
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+			var note = (Note)value;
+
+			writer.WriteStartObject();
+			writer.WritePropertyName("NoteId");
+			writer.WriteValue(note.NoteId);
+			writer.WritePropertyName("Date");
+			writer.WriteValue(note.Date);
+			writer.WritePropertyName("Height");
+			writer.WriteValue(note.Height.ToString());
+			if (note.BezierPath != null && !note.BezierPath.Empty)
+			{
+				writer.WritePropertyName("BezierPath");
+				writer.WriteValue(note.NoteId);
+			}
+			writer.WriteEnd();
+		}
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			var note = new Note();
+
+			while (reader.Read())
+			{
+				var type = reader.TokenType;
+				if (type == JsonToken.PropertyName)
+				{
+					switch (reader.Value.ToString().ToLower())
+					{
+						case "noteid":
+							note.NoteId = reader.ReadAsInt32().Value;
+							break;
+
+						case "date":
+							note.Date = reader.ReadAsDateTime().Value;
+							break;
+
+						case "height":
+							nfloat temp = 0f;
+							nfloat.TryParse(reader.ReadAsString(), out temp);
+							note.Height = temp;
+							break;
+
+					}
+				}
+			}
+
+			return note;
+		}
+	}
+
 
 	public class nfloatConverter : JsonConverter
 	{

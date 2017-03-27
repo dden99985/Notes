@@ -84,7 +84,7 @@ namespace Notes.Data
 			writer.WritePropertyName("Date");
 			writer.WriteValue(note.Date);
 			writer.WritePropertyName("Height");
-			writer.WriteValue(note.Height.ToString());
+			writer.WriteValue((Double)note.Height);
 			if (note.BezierPath != null && !note.BezierPath.Empty)
 			{
 				writer.WritePropertyName("BezierPath");
@@ -113,9 +113,7 @@ namespace Notes.Data
 							break;
 
 						case "height":
-							nfloat temp = 0f;
-							nfloat.TryParse(reader.ReadAsString(), out temp);
-							note.Height = temp;
+							note.Height = (nfloat)reader.ReadAsDouble().Value;
 							break;
 
 					}
@@ -136,14 +134,12 @@ namespace Notes.Data
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
-			writer.WriteValue(value.ToString());
+			writer.WriteValue((Double)value);
 		}
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			nfloat temp = 0f;
-			nfloat.TryParse(reader.Value.ToString(), out temp);
-			return temp;
+			return (nfloat)reader.ReadAsDouble();
 		}
 
 	}

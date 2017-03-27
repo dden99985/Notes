@@ -25,7 +25,6 @@ namespace Notes.Data
 
 		void Write();
 		void Read();
-
 	}
 
 

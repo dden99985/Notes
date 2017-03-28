@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using CoreGraphics;
 using Newtonsoft.Json;
 using UIKit;
 
@@ -32,10 +33,17 @@ namespace Notes.Data
 			return Path.Combine(DB.DBPath, "Notes", filename);
 		}
 
+		public static string GetDrawingPath(int NoteId)
+		{
+			var filename = String.Format("{0:0000000000}.drawing", NoteId);
+			return Path.Combine(DB.DBPath, "Notes", filename);
+		}
+
+
 		public int NoteId { get; set; }
 		public DateTime Date { get; set; }
 		public nfloat Height { get; set; }
-		public UIBezierPath BezierPath { get; set; }
+		public CGPath Drawing { get; set; }
 
 		public void Initialize()
 		{
@@ -49,20 +57,20 @@ namespace Notes.Data
 		{
 		}
 
-		public Note(nfloat Height, UIBezierPath BezierPath)
+		public Note(nfloat Height, CGPath Path)
 		{
 			Initialize();
 			this.Height = Height;
-			this.BezierPath = BezierPath;
+			this.Drawing = Path;
 		}
 
 		[JsonConstructor]
-		public Note(int NoteId, DateTime Date, nfloat Height, UIBezierPath BezierPath)
+		public Note(int NoteId, DateTime Date, nfloat Height, CGPath Path)
 		{
 			this.NoteId = NoteId;
 			this.Date = Date;
 			this.Height = Height;
-			this.BezierPath = BezierPath;
+			this.Drawing = Path;
 		}
 
 	}
@@ -85,9 +93,9 @@ namespace Notes.Data
 			writer.WriteValue(note.Date);
 			writer.WritePropertyName("Height");
 			writer.WriteValue((Double)note.Height);
-			if (note.BezierPath != null && !note.BezierPath.Empty)
+			if (note.Drawing != null && !note.Drawing.IsEmpty)
 			{
-				writer.WritePropertyName("BezierPath");
+				writer.WritePropertyName("Drawing");
 				writer.WriteValue(note.NoteId);
 			}
 			writer.WriteEnd();

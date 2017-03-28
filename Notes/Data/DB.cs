@@ -114,25 +114,25 @@ namespace Notes.Data
 			{
 				AllNotes = new NotesList();
 
-				Note tmp;
-				tmp = new Note(40, new UIKit.UIBezierPath());
-				DB.WriteObject(tmp);
-				AllNotes.Add(tmp);
-				tmp = new Note(40, new UIKit.UIBezierPath());
-				DB.WriteObject(tmp);
-				AllNotes.Add(tmp);
-				tmp = new Note(40, new UIKit.UIBezierPath());
-				DB.WriteObject(tmp);
-				AllNotes.Add(tmp);
-				tmp = new Note(40, new UIKit.UIBezierPath());
-				DB.WriteObject(tmp);
-				AllNotes.Add(tmp);
-				tmp = new Note(40, new UIKit.UIBezierPath());
-				DB.WriteObject(tmp);
-				AllNotes.Add(tmp);
-				tmp = new Note(40, new UIKit.UIBezierPath());
-				DB.WriteObject(tmp);
-				AllNotes.Add(tmp);
+				//Note tmp;
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
+				//tmp = new Note(40, new UIKit.UIBezierPath());
+				//DB.WriteObject(tmp);
+				//AllNotes.Add(tmp);
 
 				// No notes in the database yet, so write the empty list
 				AllNotes.Write();

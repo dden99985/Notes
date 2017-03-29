@@ -110,32 +110,39 @@ namespace Notes.Data
 			{
 				AllNotes = DB.ReadObject<NotesList>(NotesList.GetPath(1));
 			}
-			catch (FileNotFoundException)
+			catch (Exception e)
 			{
-				AllNotes = new NotesList();
+				if (e is FileNotFoundException || e is DirectoryNotFoundException)
+				{
+					AllNotes = new NotesList();
 
-				//Note tmp;
-				//tmp = new Note(40, new UIKit.UIBezierPath());
-				//DB.WriteObject(tmp);
-				//AllNotes.Add(tmp);
-				//tmp = new Note(40, new UIKit.UIBezierPath());
-				//DB.WriteObject(tmp);
-				//AllNotes.Add(tmp);
-				//tmp = new Note(40, new UIKit.UIBezierPath());
-				//DB.WriteObject(tmp);
-				//AllNotes.Add(tmp);
-				//tmp = new Note(40, new UIKit.UIBezierPath());
-				//DB.WriteObject(tmp);
-				//AllNotes.Add(tmp);
-				//tmp = new Note(40, new UIKit.UIBezierPath());
-				//DB.WriteObject(tmp);
-				//AllNotes.Add(tmp);
-				//tmp = new Note(40, new UIKit.UIBezierPath());
-				//DB.WriteObject(tmp);
-				//AllNotes.Add(tmp);
+					Note tmp;
+					tmp = new Note(40, new CoreGraphics.CGPath());
+					DB.WriteObject(tmp);
+					AllNotes.Add(tmp);
+					tmp = new Note(40, new CoreGraphics.CGPath());
+					DB.WriteObject(tmp);
+					AllNotes.Add(tmp);
+					tmp = new Note(40, new CoreGraphics.CGPath());
+					DB.WriteObject(tmp);
+					AllNotes.Add(tmp);
+					tmp = new Note(40, new CoreGraphics.CGPath());
+					DB.WriteObject(tmp);
+					AllNotes.Add(tmp);
+					tmp = new Note(40, new CoreGraphics.CGPath());
+					DB.WriteObject(tmp);
+					AllNotes.Add(tmp);
+					tmp = new Note(40, new CoreGraphics.CGPath());
+					DB.WriteObject(tmp);
+					AllNotes.Add(tmp);
 
-				// No notes in the database yet, so write the empty list
-				AllNotes.Write();
+					// No notes in the database yet, so write the empty list
+					AllNotes.Write();
+					return;
+
+				}
+
+				throw;
 			}
 
 		}

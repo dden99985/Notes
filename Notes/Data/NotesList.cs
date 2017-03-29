@@ -49,7 +49,6 @@ namespace Notes.Data
 			writer.WriteStartArray();
 			foreach (Note note in list)
 			{
-				//				writer.WritePropertyName("NoteId");
 				writer.WriteValue(note.NoteId);
 			}
 			writer.WriteEndArray();

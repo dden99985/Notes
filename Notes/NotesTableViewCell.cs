@@ -11,7 +11,33 @@ namespace Notes
 {
 	public partial class NotesTableViewCell : UITableViewCell
 	{
-		public Data.Note Note { get; set; }
+		private Data.Note note;
+
+		public Data.Note Note
+		{
+			get
+			{
+				return note;
+			}
+			set
+			{
+				note = value;
+				if (note.Drawing != null)
+				{
+					path = note.Drawing;
+				}
+				else
+				{
+					path = new CGPath();
+					path.AddLines(new CGPoint[]{
+					new CGPoint(5,5),
+					new CGPoint(20,20),
+					new CGPoint(5,20)});
+					path.CloseSubpath();
+				}
+
+			}
+		}
 
 
 		public WeakReference ViewController { get; set; }
@@ -24,14 +50,7 @@ namespace Notes
 
 		public NotesTableViewCell(IntPtr handle) : base(handle)
 		{
-			path = new CGPath();
 			partPath = new CGPath();
-
-			path.AddLines(new CGPoint[]{
-					new CGPoint(5,5),
-					new CGPoint(20,20),
-					new CGPoint(5,20)});
-			path.CloseSubpath();
 		}
 
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
@@ -151,10 +170,15 @@ namespace Notes
 
 		protected void addPoint(CGPoint aNewPoint)
 		{
-
 			if (nextPoint < 4)
 			{
 				bezierPoints[nextPoint] = aNewPoint;
+
+				if (nextPoint == 0)
+				{
+					// set the starting point
+					path.MoveToPoint(bezierPoints[0]);
+				}
 
 				// Draw this partial segment so it doesn't appear that the line is always lagging a bit behind the penn
 				partPath = new CGPath();
@@ -172,7 +196,6 @@ namespace Notes
 				//        nextPoint++;
 				//        [self setNeedsDisplayInRect:CGRectInset([partPath bounds], -10, -10)];
 			}
-
 			else
 			{
 				// Calculate the endpoint of this curve (and the start point of the next curve) to the middle of an
@@ -181,11 +204,6 @@ namespace Notes
 				bezierPoints[3] = new CGPoint((bezierPoints[2].X + aNewPoint.X) / 2.0,
 											  (bezierPoints[2].Y + aNewPoint.Y) / 2.0);
 				partPath = new CGPath();
-				if (path.IsEmpty)
-				{
-					// set the starting point
-					path.MoveToPoint(bezierPoints[0]);
-				}
 
 				// Add the new curve to the path
 				path.AddCurveToPoint(bezierPoints[3], bezierPoints[1], bezierPoints[2]);
